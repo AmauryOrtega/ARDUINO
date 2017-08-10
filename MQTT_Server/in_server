@@ -1,2 +1,2 @@
 #!/bin/zsh
-docker exec -it mqtt bash
+docker exec -it mqtt sh
