@@ -9,6 +9,7 @@ SHT21 3.3V
 // https://github.com/adafruit/TSL2561-Arduino-Library/blob/master/examples/tsl2561/tsl2561.ino
 #include <ESP8266WiFi.h>
 #include <Wire.h>
+#include "UbidotsMicroESP8266.h"
 
 // Definiciones https://www.aurel32.net/elec/pcf8591.pdf
 #define PCF8591 (0x90 >> 1) // Dirreccion del bus I2C 1001 0000
@@ -17,6 +18,14 @@ SHT21 3.3V
 #define PCF8591_ADC1 0x01
 #define PCF8591_ADC2 0x02
 #define PCF8591_ADC3 0x03
+
+// Definiciones 2
+#define TOKEN  "A1E-r3XVrLoGTWh6IhM7txujBeyy8BEiM7"  // Put here your Ubidots TOKEN
+#define ID_1 "598f4e8bc03f977311cbc530" // Put your variable ID here
+//#define ID_2 "Your_variable_ID_here" // Put your variable ID here
+#define WIFISSID "SEMARD" // Put here your Wi-Fi SSID
+#define PASSWORD "SEMARD123" // Put here your Wi-Fi password
+Ubidots client(TOKEN);
 
 // Variables
 SHT21 SHT21;
@@ -36,6 +45,9 @@ void setup(){
   SHT21.begin();
   // Inicializa el TSL2561
   tsl.begin();
+
+  client.wifiConnection(WIFISSID, PASSWORD);
+  client.setDebug(true); // Uncomment this line to set DEBUG on
 }
 
 void loop(){
@@ -43,6 +55,9 @@ void loop(){
   leerSHT21();
   leerTSL2561();
   Serial.println();
+  client.add(ID_1, SHT21.getTemperature());
+  //client.add(ID_2, value2);
+  client.sendAll(false);
   delay(500);
 }
 
