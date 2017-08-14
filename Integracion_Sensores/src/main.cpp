@@ -18,18 +18,18 @@ SHT21 3.3V
 #define PCF8591_ADC1 0x01
 #define PCF8591_ADC2 0x02
 #define PCF8591_ADC3 0x03
-
-// Definiciones 2
-#define TOKEN  "A1E-r3XVrLoGTWh6IhM7txujBeyy8BEiM7"  // Put here your Ubidots TOKEN
-#define ID_1 "598f4e8bc03f977311cbc530" // Put your variable ID here
-//#define ID_2 "Your_variable_ID_here" // Put your variable ID here
-#define WIFISSID "SEMARD" // Put here your Wi-Fi SSID
-#define PASSWORD "SEMARD123" // Put here your Wi-Fi password
-Ubidots client(TOKEN);
+#define TOKEN "A1E-r3XVrLoGTWh6IhM7txujBeyy8BEiM7"
+#define ID_Temperatura "598f4e8bc03f977311cbc530"
+#define ID_Humedad "59911b45c03f9752cf20caa1"
+#define ID_Humedad_Relativa "59911bf3c03f9752f035c95b"
+#define ID_Luminosidad "59911c03c03f9752f035c95c"
+#define WIFISSID "SEMARD"
+#define PASSWORD "SEMARD123"
 
 // Variables
 SHT21 SHT21;
 TSL2561 tsl(TSL2561_ADDR_FLOAT);
+Ubidots client(TOKEN);
 
 // Prototipos de funciones
 int leerPCF8591_Pin(unsigned int pin);
@@ -55,10 +55,7 @@ void loop(){
   leerSHT21();
   leerTSL2561();
   Serial.println();
-  client.add(ID_1, SHT21.getTemperature());
-  //client.add(ID_2, value2);
-  client.sendAll(false);
-  delay(500);
+  delay(1000);
 }
 
 int leerPCF8591_Pin(unsigned int pin){
@@ -87,6 +84,14 @@ void leerPCF8591(){
     Serial.print("%) (3:");
     Serial.print(leerPCF8591_Pin(PCF8591_ADC3));
     Serial.println("%) ]");
+    client.add(ID_Humedad,
+        (leerPCF8591_Pin(PCF8591_ADC0) +
+         leerPCF8591_Pin(PCF8591_ADC1) +
+         leerPCF8591_Pin(PCF8591_ADC2) +
+         leerPCF8591_Pin(PCF8591_ADC3)
+        )/4
+    );
+    client.sendAll(false);
 }
 
 void leerSHT21(){
@@ -94,6 +99,9 @@ void leerSHT21(){
     Serial.print("H: ");Serial.print(SHT21.getHumidity());Serial.print("% ");
     Serial.print("T: ");Serial.print(SHT21.getTemperature());Serial.print(" °C");
     Serial.println(" ]");
+    client.add(ID_Humedad_Relativa, SHT21.getHumidity());
+    client.add(ID_Temperatura, SHT21.getTemperature());
+    client.sendAll(false);
 }
 
 void leerTSL2561(){
@@ -101,4 +109,6 @@ void leerTSL2561(){
     Serial.print("TSL2561 [ ");
     Serial.print(x, DEC);
     Serial.println(" ]");
+    client.add(ID_Luminosidad, x);
+    client.sendAll(false);
 }
