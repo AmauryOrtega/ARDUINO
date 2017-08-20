@@ -55,7 +55,7 @@ void loop(){
   leerSHT21();
   leerTSL2561();
   Serial.println();
-  delay(1000);
+  delay(5000);
 }
 
 int leerPCF8591_Pin(unsigned int pin){
